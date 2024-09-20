@@ -1,5 +1,5 @@
 function createDeck() {
-  const suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
+  const suits = ['♥️', '♦️', '♣️', '♠️'];
   const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace'];
   let deck = [];
 
@@ -57,7 +57,7 @@ function printBoard(players, discardPile) {
   players.forEach((player) => {
     console.log(
       `${player.name}'s hand: `,
-      player.hand.map((card) => (card.faceUp ? `${card.value} of ${card.suit}` : '??'))
+      player.hand.map((card) => (card.faceUp ? `${card.value} of ${card.suit}` : '🃏'))
     );
   });
   console.log(
