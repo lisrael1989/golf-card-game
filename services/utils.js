@@ -21,11 +21,16 @@ function shuffleDeck(deck) {
 }
 
 function drawCard(deck) {
+  if (deck.length === 0) {
+    console.log('No more cards in deck');
+    return null;
+  }
   return deck.pop();
 }
 
 function addToDiscardPile(discardPile, card) {
   discardPile.push(card);
+  return discardPile;
 }
 
 function calculateScore(hand) {
