@@ -120,7 +120,7 @@ function endGame(players, discardPile) {
     console.log(`${player.name}'s score: ${score}`);
   });
 
-  let winner = players[0].score > players[1].score ? players[0] : players[1];
+  let winner = players[0].score < players[1].score ? players[0] : players[1];
   console.log(`Winner 🥇: ${winner.name}`);
 
   rl.question('Play again? (y/n)\n', (input) => {
