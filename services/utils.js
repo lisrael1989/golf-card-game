@@ -34,6 +34,8 @@ function calculateScore(hand) {
   hand.forEach((card) => {
     if (card.value === '7') {
       score += 0;
+    } else if (card.value === 'Ace') {
+      score += 1;
     } else if (card.value === 'Jack') {
       score -= 1;
     } else if (card.value === 'Queen') {
