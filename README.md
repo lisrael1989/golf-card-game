@@ -70,7 +70,6 @@ This is a browser-based implementation of the Golf Card Game. Two human players 
 ## Technologies Used
 
 - **HTML5**: Structure of the web page.
-- **CSS3**: Styling for the user interface.
 - **JavaScript (ES6)**: Game logic and interactions.
 - **Git**: Version control.
 
