@@ -52,22 +52,6 @@ function selectRandomPlayer(players) {
   return players[Math.floor(Math.random() * players.length)];
 }
 
-function printBoard(players, discardPile) {
-  console.log('--- Game Board ---');
-  players.forEach((player) => {
-    console.log(
-      `${player.name}'s hand: `,
-      player.hand.map((card) => (card.faceUp ? `${card.value} of ${card.suit}` : '🃏'))
-    );
-  });
-  console.log(
-    'Discard Pile top card:',
-    discardPile.length
-      ? `${discardPile[discardPile.length - 1].value} of ${discardPile[discardPile.length - 1].suit}`
-      : 'Empty'
-  );
-}
-
 module.exports = {
   createDeck,
   shuffleDeck,
@@ -75,5 +59,4 @@ module.exports = {
   addToDiscardPile,
   calculateScore,
   selectRandomPlayer,
-  printBoard,
 };
