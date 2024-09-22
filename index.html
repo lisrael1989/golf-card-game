@@ -3,9 +3,35 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/styles/style.css" />
     <title>Golf card game</title>
   </head>
-  <body></body>
+  <body>
+    <main id="game-container">
+      <section id="players">
+        <section id="player1" class="player">
+          <h3>Player 1</h3>
+          <section class="hand" id="player1-hand"></section>
+        </section>
+        <section id="player2" class="player">
+          <h3>Player 2</h3>
+          <section class="hand" id="player2-hand"></section>
+        </section>
+      </section>
+
+      <section id="controls">
+        <h3 id="current-turn">Player 1's turn</h3>
+        <button id="draw-deck">Draw from Deck</button>
+        <button id="take-discard">Take from Discard Pile</button>
+        <button id="end-turn" disabled>End Turn</button>
+      </section>
+
+      <section id="discard-pile">
+        <h3>Discard Pile</h3>
+        <section id="discard-card">Empty</section>
+      </section>
+    </main>
+  </body>
 
   <script type="module" src="./services/app.js"></script>
 </html>
