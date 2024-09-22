@@ -7,6 +7,10 @@ const {
   calculateScore,
 } = require('./utils.js');
 const readline = require('readline');
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
 
 startGame();
 
@@ -15,7 +19,7 @@ function printBoard(players, discardPile) {
   players.forEach((player) => {
     console.log(
       `${player.name}'s hand: `,
-      player.hand.map((card, index) => `${card.faceUp ? `${card.value} of ${card.suit}` : '🃏'}`)
+      player.hand.map((card) => (card.faceUp ? `${card.value} of ${card.suit}` : '🃏')).join(', ')
     );
   });
   console.log(
@@ -41,91 +45,93 @@ function startGame() {
   });
 
   addToDiscardPile(discardPile, drawCard(deck));
-
   let currentPlayer = selectRandomPlayer(players);
 
   console.log('Game started!');
   console.log(`${currentPlayer.name} starts the game.`);
 
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
+  playTurn(players, discardPile, deck, currentPlayer);
+}
+
+function playTurn(players, discardPile, deck, currentPlayer) {
+  printBoard(players, discardPile);
+  console.log(`${currentPlayer.name}'s turn`);
+
+  rl.question('Choose action: (1) Draw card from deck, (2) Take card from discard pile\n', (input) => {
+    if (input === '1') {
+      let drawnCard = drawCard(deck);
+      console.log(`You drew: ${drawnCard.value} of ${drawnCard.suit}`);
+
+      rl.question('Choose: (1) Replace one face-down card, (2) Discard drawn card\n', (choice) => {
+        if (choice === '1') {
+          replaceCard(currentPlayer, drawnCard, discardPile, players, deck);
+        } else {
+          addToDiscardPile(discardPile, drawnCard);
+          endTurn(players, discardPile, deck, currentPlayer);
+        }
+      });
+    } else if (input === '2') {
+      let topDiscard = discardPile.pop();
+      console.log(`You took: ${topDiscard.value} of ${topDiscard.suit}`);
+      replaceCard(currentPlayer, topDiscard, discardPile, players, deck);
+    } else {
+      console.log('invalid choice,try again');
+      playTurn(players, discardPile, deck, currentPlayer);
+    }
+  });
+}
+
+function replaceCard(player, newCard, discardPile, players, deck) {
+  rl.question('Choose a card to replace (1-4):\n', (input) => {
+    let index = parseInt(input) - 1;
+    if (index >= 0 && index < 4) {
+      let replacedCard = player.hand[index];
+      if (!replacedCard.faceUp) {
+        player.hand[index] = { ...newCard, faceUp: true };
+        addToDiscardPile(discardPile, replacedCard);
+        endTurn(players, discardPile, deck, player);
+      } else {
+        console.log('This card is already face up,try again');
+        replaceCard(player, newCard, discardPile, players, deck);
+      }
+    } else {
+      console.log('invalid choice,try again');
+      replaceCard(player, newCard, discardPile, players, deck);
+    }
+  });
+}
+
+function endTurn(players, discardPile, deck, currentPlayer) {
+  if (players.every((player) => player.hand.every((card) => card.faceUp === true))) {
+    endGame(players, discardPile);
+  } else {
+    currentPlayer = currentPlayer.name === 'player1' ? players[1] : players[0];
+    playTurn(players, discardPile, deck, currentPlayer);
+  }
+}
+
+function endGame(players, discardPile) {
+  console.log('--- Final board ---');
+  printBoard(players, discardPile);
+
+  players.forEach((player) => {
+    let score = calculateScore(player.hand);
+    player.score = score;
+    console.log(`${player.name}'s score: ${score}`);
   });
 
-  function playTurn() {
-    printBoard(players, discardPile);
-    console.log(`${currentPlayer.name}'s turn`);
-    rl.question('Choose action: (1) Draw card from deck, (2) Take card from discard pile\n', (input) => {
-      if (input === '1') {
-        let drawnCard = drawCard(deck);
-        console.log(`You drew: ${drawnCard.value} of ${drawnCard.suit}`);
-        rl.question('Choose: (1) Replace one face-down card, (2) Discard drawn card\n', (choice) => {
-          if (choice === '1') {
-            replaceCard(currentPlayer, drawnCard);
-          } else {
-            addToDiscardPile(discardPile, drawnCard);
-            endTurn();
-          }
-        });
-      } else if (input === '2') {
-        let topDiscard = discardPile.pop();
-        console.log(`You took: ${topDiscard.value} of ${topDiscard.suit}`);
-        replaceCard(currentPlayer, topDiscard);
-      } else {
-        console.log('invalid choice,try again');
-        playTurn();
-      }
-    });
-  }
+  let winner = players[0].score > players[1].score ? players[0] : players[1];
+  console.log(`Winner 🥇: ${winner.name}`);
 
-  function replaceCard(player, newCard) {
-    rl.question('Choose a card to replace (1-4):\n', (input) => {
-      let index = parseInt(input) - 1;
-      if (index >= 0 && index < 4) {
-        let replacedCard = player.hand[index];
-        if (!replacedCard.faceUp) {
-          player.hand[index] = { ...newCard, faceUp: true };
-          addToDiscardPile(discardPile, replacedCard);
-          endTurn();
-        } else {
-          console.log('This card is already face up,try again');
-          replaceCard(player, newCard);
-        }
-      } else {
-        console.log('invalid choice,try again');
-        replaceCard(player, newCard);
-      }
-    });
-  }
+  rl.question('Play again? (y/n)\n', (input) => {
+    if (input.toLowerCase() === 'y') {
+      console.log('--- New game ---');
 
-  function endTurn() {
-    if (players.some((player) => player.hand.every((card) => card.faceUp === true))) {
-      endGame();
+      startGame();
     } else {
-      currentPlayer = currentPlayer.name === 'player1' ? players[1] : players[0];
-      playTurn();
+      console.log('Thank you for playing!');
+
+      rl.close();
     }
-  }
-
-  function endGame() {
-    console.log('--- Final board ---');
-    printBoard(players, discardPile);
-
-    players.forEach((player) => {
-      let score = calculateScore(player.hand);
-      console.log(`${player.name}'s score: ${score}`);
-    });
-
-    let winner = players[0].score > players[1].score ? players[0] : players[1];
-    console.log(`Winner: ${winner.name}`);
-
-    rl.question('Play again? (y/n)\n', (input) => {
-      if (input.toLowerCase() === 'y') {
-        startGame();
-      } else {
-        rl.close();
-      }
-    });
-  }
-  playTurn();
+  });
 }
